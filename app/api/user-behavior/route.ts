@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { LiquidModel } from '@/lib/liquid-model'
+import { LiquidModel } from '@/app/lib/liquid-model'
 
 export async function GET() {
   try {

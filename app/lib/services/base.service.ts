@@ -1,4 +1,4 @@
-import { LiquidModel } from '@/lib/liquid-model'
+import { LiquidModel } from '@/app/lib/liquid-model'
 
 export class BaseService {
   protected liquidModel: LiquidModel
