@@ -1,8 +1,4 @@
-Key: NEXT_PUBLIC_SUPABASE_URL
-Value: https://ggphuivpkvhkkpyramao.supabase.co
-
-Key: NEXT_PUBLIC_SUPABASE_ANON_KEY
-Value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdncGh1aXZwa3Zoa2tweXJhbWFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDM5NDQ5ODUsImV4cCI6MjAxOTUyMDk4NX0.5NM3ZMD_gy_JxVFcWtJPyqtL6rFN3PD7K1rGPHcAMZk# dependencies
+# dependencies
 /node_modules
 /.pnp
 .pnp.js
@@ -27,8 +23,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
 .env
+.env*.local
 
 # vercel
 .vercel
@@ -37,24 +33,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-node_modules
+# IDE
+.vscode
+.idea
