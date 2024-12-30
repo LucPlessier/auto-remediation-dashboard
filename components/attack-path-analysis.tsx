@@ -1,8 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Loader2, Shield } from "lucide-react"
+import React from 'react'
 
 interface AttackPathAnalysisProps {
   data?: {
@@ -15,7 +13,7 @@ interface AttackPathAnalysisProps {
   }
 }
 
-export function AttackPathAnalysis({ 
+export default function AttackPathAnalysis({ 
   data = {
     paths: [
       { id: '1', name: 'Critical Infrastructure Access', risk: 85, steps: 4 },
@@ -25,55 +23,39 @@ export function AttackPathAnalysis({
   } 
 }: AttackPathAnalysisProps) {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle>Attack Path Analysis</CardTitle>
-        <Shield className="h-4 w-4 text-muted-foreground" />
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {data.paths.map((path) => (
-            <div key={path.id} className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-medium">{path.name}</span>
-                <span className={`text-sm ${
-                  path.risk >= 80 ? 'text-red-500' :
-                  path.risk >= 60 ? 'text-yellow-500' :
-                  'text-green-500'
-                }`}>
-                  Risk: {path.risk}%
-                </span>
-              </div>
-              <div className="flex items-center">
-                <div className="flex-1 bg-gray-200 rounded-full h-2">
-                  <div
-                    className={`h-2 rounded-full ${
-                      path.risk >= 80 ? 'bg-red-500' :
-                      path.risk >= 60 ? 'bg-yellow-500' :
-                      'bg-green-500'
-                    }`}
-                    style={{ width: `${path.risk}%` }}
-                  />
-                </div>
-                <span className="ml-4 text-sm text-gray-600">
-                  {path.steps} steps
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-muted-foreground">
-                  Last updated: 
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                >
-                  Simulate Attack
-                </Button>
-              </div>
+    <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+      <h3 className="text-lg font-semibold mb-4">Attack Path Analysis</h3>
+      <div className="space-y-4">
+        {data.paths.map((path) => (
+          <div key={path.id} className="border rounded-lg p-4">
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="font-medium">{path.name}</h4>
+              <span className={`px-2 py-1 rounded text-sm ${
+                path.risk >= 80 ? 'bg-red-100 text-red-800' :
+                path.risk >= 60 ? 'bg-yellow-100 text-yellow-800' :
+                'bg-green-100 text-green-800'
+              }`}>
+                Risk: {path.risk}%
+              </span>
             </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+            <div className="flex items-center">
+              <div className="flex-1 bg-gray-200 rounded-full h-2">
+                <div
+                  className={`h-2 rounded-full ${
+                    path.risk >= 80 ? 'bg-red-500' :
+                    path.risk >= 60 ? 'bg-yellow-500' :
+                    'bg-green-500'
+                  }`}
+                  style={{ width: `${path.risk}%` }}
+                />
+              </div>
+              <span className="ml-4 text-sm text-gray-600">
+                {path.steps} steps
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
