@@ -1,9 +1,6 @@
-import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { authOptions } from '@/lib/auth';
-import { AutoRemediationService } from '@/services/auto-remediation';
+import { NextResponse } from "next/server"
+import prisma from "@/app/lib/prisma"
+import { AutoRemediation } from "@/services/auto-remediation"
 
 // Validation schemas
 const RemediationStatusSchema = z.object({
@@ -22,13 +19,8 @@ const RemediationConfigSchema = z.object({
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return new NextResponse('Unauthorized', { status: 401 });
-    }
-
-    const remediationService = new AutoRemediationService();
-    const status = await remediationService.getStatus();
+    const autoRemediation = new AutoRemediation()
+    const status = await autoRemediation.getStatus();
     
     // Get historical metrics
     const metrics = await prisma.remediationMetrics.findMany({
@@ -52,38 +44,28 @@ export async function GET() {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return new NextResponse('Unauthorized', { status: 401 });
-    }
-
-    const data = await req.json();
-    const config = RemediationConfigSchema.parse(data);
-
-    const remediationService = new AutoRemediationService();
-    await remediationService.updateConfig(config);
-
-    return new NextResponse('Configuration updated', { status: 200 });
+    const data = await request.json()
+    const autoRemediation = new AutoRemediation()
+    const result = await autoRemediation.executeRemediation(data)
+    return NextResponse.json({ result })
   } catch (error) {
-    console.error('Error updating auto-remediation config:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    console.error("Error in auto-remediation:", error)
+    return NextResponse.json(
+      { error: "Failed to execute auto-remediation" },
+      { status: 500 }
+    )
   }
 }
 
 export async function PUT(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return new NextResponse('Unauthorized', { status: 401 });
-    }
-
-    const data = await req.json();
+    const data = await req.json()
     const status = RemediationStatusSchema.parse(data);
 
-    const remediationService = new AutoRemediationService();
-    await remediationService.updateStatus(status);
+    const autoRemediation = new AutoRemediation()
+    await autoRemediation.updateStatus(status);
 
     return new NextResponse('Status updated', { status: 200 });
   } catch (error) {
