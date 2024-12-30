@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { cn } from "@/lib/utils"
+import { cn } from "@/app/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { LayoutDashboard, Shield, Search, Activity, Globe, AlertTriangle, Brain, Network, UserCheck, BarChart, Settings, GitCompare, FileCode } from 'lucide-react'
@@ -46,4 +46,3 @@ export function SideNav() {
     </div>
   )
 }
-
