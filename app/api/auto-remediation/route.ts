@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import prisma from "@/app/lib/prisma"
-import { autoRemediationService } from "@/services/auto-remediation"
+import { AutoRemediationService } from "@/services/auto-remediation"
 import { z } from 'zod'
 
 // Validation schemas
@@ -23,41 +23,31 @@ const RemediationConfigSchema = z.object({
 
 export async function GET() {
   try {
-    const service = new autoRemediationService()
+    const service = new AutoRemediationService()
     const status = await service.getStatus()
 
     // Get historical metrics
-    const metrics = await prisma.securityMetric.findMany({
-      where: { category: 'remediation' },
-      orderBy: { timestamp: 'desc' },
-      take: 30, // Last 30 data points
+    const metrics = await prisma.autoRemediationMetrics.findMany({
+      take: 7,
+      orderBy: { timestamp: 'desc' }
     })
 
-    return NextResponse.json({
-      ...status,
-      metrics
-    })
+    return NextResponse.json({ status, metrics })
   } catch (error) {
-    console.error('Error fetching auto-remediation status:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch auto-remediation status' },
-      { status: 500 }
-    )
+    console.error('Error in auto-remediation GET:', error)
+    return new NextResponse('Internal Server Error', { status: 500 })
   }
 }
 
 export async function POST(request: Request) {
   try {
     const data = await request.json()
-    const service = new autoRemediationService()
+    const service = new AutoRemediationService()
     const result = await service.executeRemediation(data)
     return NextResponse.json({ result })
   } catch (error) {
-    console.error("Error in auto-remediation:", error)
-    return NextResponse.json(
-      { error: "Failed to execute auto-remediation" },
-      { status: 500 }
-    )
+    console.error('Error in auto-remediation POST:', error)
+    return new NextResponse('Internal Server Error', { status: 500 })
   }
 }
 
@@ -66,12 +56,12 @@ export async function PUT(req: Request) {
     const data = await req.json()
     const status = RemediationStatusSchema.parse(data)
     
-    const service = new autoRemediationService()
+    const service = new AutoRemediationService()
     await service.updateStatus(status)
 
     return new NextResponse('Status updated', { status: 200 })
   } catch (error) {
-    console.error("Error updating auto-remediation status:", error)
-    return new NextResponse('Invalid status data', { status: 400 })
+    console.error('Error in auto-remediation PUT:', error)
+    return new NextResponse('Internal Server Error', { status: 500 })
   }
 }

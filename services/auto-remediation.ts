@@ -1,4 +1,5 @@
 import prisma from "@/app/lib/prisma"
+import { PrismaClient } from "@prisma/client"
 import { z } from 'zod';
 
 // Types
@@ -20,25 +21,31 @@ export interface RemediationConfig {
 }
 
 export class AutoRemediationService {
+  private prisma: PrismaClient
+
+  constructor() {
+    this.prisma = prisma
+  }
+
   async getStatus(): Promise<RemediationStatus> {
     try {
       // Get current status from database
-      const status = await prisma.autoRemediationStatus.findFirst({
+      const status = await this.prisma.autoRemediationStatus.findFirst({
         orderBy: { timestamp: 'desc' },
       })
 
       // Get active remediations
-      const activeCount = await prisma.remediation.count({
+      const activeCount = await this.prisma.remediation.count({
         where: { status: 'active' },
       })
 
       // Get completed remediations
-      const completedCount = await prisma.remediation.count({
+      const completedCount = await this.prisma.remediation.count({
         where: { status: 'completed' },
       })
 
       // Get failed remediations
-      const failedCount = await prisma.remediation.count({
+      const failedCount = await this.prisma.remediation.count({
         where: { status: 'failed' },
       })
 
@@ -73,7 +80,7 @@ export class AutoRemediationService {
   async updateStatus(status: { remediationId: string; status: string; details?: Record<string, unknown> }): Promise<void> {
     try {
       // Update remediation status in database
-      await prisma.remediation.update({
+      await this.prisma.remediation.update({
         where: { id: status.remediationId },
         data: {
           status: status.status,
@@ -93,7 +100,7 @@ export class AutoRemediationService {
   }
 
   private async getConfig(): Promise<RemediationConfig> {
-    const config = await prisma.autoRemediationConfig.findFirst({
+    const config = await this.prisma.autoRemediationConfig.findFirst({
       orderBy: { timestamp: 'desc' },
     });
 
@@ -108,7 +115,7 @@ export class AutoRemediationService {
 
   private async createIncident(remediationId: string, details?: Record<string, unknown>): Promise<void> {
     try {
-      const remediation = await prisma.remediation.findUnique({
+      const remediation = await this.prisma.remediation.findUnique({
         where: { id: remediationId },
       });
 
@@ -116,7 +123,7 @@ export class AutoRemediationService {
         throw new Error('Remediation not found');
       }
 
-      await prisma.incident.create({
+      await this.prisma.incident.create({
         data: {
           title: `Auto-remediation failure: ${remediation.title}`,
           description: `Auto-remediation action failed.\nRemediation ID: ${remediationId}\nDetails: ${JSON.stringify(details, null, 2)}`,
@@ -130,40 +137,5 @@ export class AutoRemediationService {
       console.error('Error creating incident for failed remediation:', error);
       throw error;
     }
-  }
-}
-
-export class autoRemediationService {
-  private prisma: PrismaClient
-
-  constructor() {
-    this.prisma = prisma
-  }
-
-  async getStatus(): Promise<RemediationStatus> {
-    // Implementation
-    return {
-      isRunning: true,
-      activeRemediations: 0,
-      completedRemediations: 0,
-      failedRemediations: 0,
-      lastUpdate: new Date(),
-      config: {
-        safeImpactThreshold: 0.3,
-        maxAffectedSystems: 10,
-        riskThreshold: 0.7,
-        systemicThreshold: 0.5,
-        monitoringInterval: 300
-      }
-    }
-  }
-
-  async executeRemediation(data: any): Promise<any> {
-    // Implementation
-    return { success: true }
-  }
-
-  async updateStatus(status: any): Promise<void> {
-    // Implementation
   }
 }
