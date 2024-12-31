@@ -22,7 +22,7 @@ export async function GET() {
         description: activity.description,
         severity: activity.severity.toLowerCase()
       })),
-      lastUpdated: threatData.last_updated
+      lastUpdated: new Date().toISOString()
     })
   } catch (error) {
     console.error('Error fetching threat data:', error)
