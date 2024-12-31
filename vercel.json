@@ -1,3 +1,10 @@
 {
-  "version": 2
+  "version": 2,
+  "name": "exposure-management-latest-5",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ]
 }
