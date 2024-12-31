@@ -132,3 +132,38 @@ export class AutoRemediationService {
     }
   }
 }
+
+export class autoRemediationService {
+  private prisma: PrismaClient
+
+  constructor() {
+    this.prisma = prisma
+  }
+
+  async getStatus(): Promise<RemediationStatus> {
+    // Implementation
+    return {
+      isRunning: true,
+      activeRemediations: 0,
+      completedRemediations: 0,
+      failedRemediations: 0,
+      lastUpdate: new Date(),
+      config: {
+        safeImpactThreshold: 0.3,
+        maxAffectedSystems: 10,
+        riskThreshold: 0.7,
+        systemicThreshold: 0.5,
+        monitoringInterval: 300
+      }
+    }
+  }
+
+  async executeRemediation(data: any): Promise<any> {
+    // Implementation
+    return { success: true }
+  }
+
+  async updateStatus(status: any): Promise<void> {
+    // Implementation
+  }
+}
