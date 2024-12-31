@@ -1,23 +1,13 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { AlertBanner } from "@/components/alert-banner"
-import { DiscoveryService } from "@/components/discovery-service"
-import { ExposureMonitoring } from "@/components/exposure-monitoring"
-import { ThreatIntel } from "@/components/threat-intel"
-import { VulnerabilityForecastChart } from "@/components/vulnerability-forecast"
-import { EnhancedAttackTrace } from "@/components/enhanced-attack-trace"
-import { RiskOverview } from "@/components/risk-overview"
-import { UserBehavior } from "@/components/user-behavior"
-import { AutomatedChanges } from "@/components/automated-changes"
-import { AttackPathAnalysis } from "@/components/attack-path-analysis"
-import { AutoRemediationPanel } from '@/components/auto-remediation-panel';
+import ThreatIntel from "@/components/threat-intel"
+import DiscoveryService from "@/components/discovery-service"
 
 export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Simulate loading time for initial data fetch
     const timer = setTimeout(() => {
       setIsLoading(false)
     }, 1000)
@@ -25,33 +15,24 @@ export default function DashboardPage() {
     return () => clearTimeout(timer)
   }, [])
 
+  if (isLoading) {
+    return (
+      <div className="flex-1 p-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <AlertBanner />
+    <div className="flex-1 p-8 space-y-8">
+      <h1 className="text-2xl font-bold">Dashboard</h1>
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <RiskOverview />
-        <UserBehavior />
+      <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
         <ThreatIntel />
-        <VulnerabilityForecastChart />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <DiscoveryService />
-        <ExposureMonitoring />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <EnhancedAttackTrace />
-        <AutomatedChanges />
-      </div>
-
-      <div className="grid gap-4">
-        <AttackPathAnalysis />
-      </div>
-
-      <div className="mt-4">
-        <AutoRemediationPanel />
       </div>
     </div>
   )

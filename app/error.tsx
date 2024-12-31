@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 
-export default function DashboardError({
+export default function Error({
   error,
   reset,
 }: {
@@ -14,19 +14,19 @@ export default function DashboardError({
   }, [error])
 
   return (
-    <div className="flex-1 p-8">
-      <div className="rounded-lg bg-white p-6 text-center shadow-lg dark:bg-gray-800">
-        <h2 className="mb-4 text-xl font-semibold text-red-600 dark:text-red-400">
-          Dashboard Error
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="rounded-lg bg-white p-8 text-center shadow-xl dark:bg-gray-800">
+        <h2 className="mb-4 text-2xl font-bold text-red-600 dark:text-red-400">
+          Something went wrong!
         </h2>
         <p className="mb-4 text-gray-600 dark:text-gray-300">
-          {error.message || 'Failed to load dashboard components'}
+          {error.message || 'An unexpected error occurred'}
         </p>
         <button
           onClick={() => reset()}
           className="rounded bg-blue-500 px-4 py-2 font-semibold text-white transition-colors hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
         >
-          Retry
+          Try again
         </button>
       </div>
     </div>
