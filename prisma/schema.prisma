@@ -6,9 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
@@ -44,4 +43,13 @@ model AutoRemediationConfig {
   key       String   @unique
   value     String
   updatedAt DateTime @updatedAt
+}
+
+model AutoRemediationMetrics {
+  id                    String   @id @default(cuid())
+  timestamp            DateTime @default(now())
+  activeRemediations   Int      @default(0)
+  completedRemediations Int      @default(0)
+  failedRemediations   Int      @default(0)
+  successRate          Float    @default(0)
 }
