@@ -46,15 +46,8 @@ export class LiquidModel {
           timestamp: new Date(Date.now() - 1800000).toISOString(),
           description: 'New ransomware variant detected',
           severity: 'HIGH'
-        },
-        {
-          type: 'Alert',
-          timestamp: new Date(Date.now() - 3600000).toISOString(),
-          description: 'Suspicious network activity',
-          severity: 'MEDIUM'
         }
-      ],
-      last_updated: new Date().toISOString()
+      ]
     }
   }
 
@@ -134,34 +127,91 @@ export class LiquidModel {
   }
 
   async getAlerts() {
-    return [
-      {
-        id: 'alert-1',
-        title: 'Critical Vulnerability Detected',
-        message: 'New critical vulnerability CVE-2023-1234 detected in production servers',
-        type: 'SECURITY',
-        severity: 'HIGH',
-        source: 'Vulnerability Scanner',
-        timestamp: new Date().toISOString(),
-        acknowledged: false,
-        related_entities: [
-          { type: 'asset', id: 'server-001', name: 'prod-web-01' }
-        ]
-      },
-      {
-        id: 'alert-2',
-        title: 'Suspicious Activity Detected',
-        message: 'Multiple failed login attempts from unknown IP address',
-        type: 'SECURITY',
-        severity: 'MEDIUM',
-        source: 'IDS',
-        timestamp: new Date(Date.now() - 1800000).toISOString(),
-        acknowledged: true,
-        related_entities: [
-          { type: 'user', id: 'user-123', name: 'john.doe' }
+    return {
+      alerts: [
+        {
+          id: '1',
+          title: 'Critical Vulnerability Detected',
+          message: 'A critical vulnerability was detected in the production server.',
+          type: 'error',
+          severity: 'critical',
+          source: 'Vulnerability Scanner',
+          timestamp: new Date().toISOString(),
+          acknowledged: false,
+          relatedEntities: [
+            {
+              type: 'server',
+              id: 'srv-001',
+              name: 'Production Web Server'
+            }
+          ]
+        },
+        {
+          id: '2',
+          title: 'Suspicious Login Activity',
+          message: 'Multiple failed login attempts detected from unusual IP.',
+          type: 'warning',
+          severity: 'high',
+          source: 'Security Gateway',
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
+          acknowledged: true,
+          relatedEntities: [
+            {
+              type: 'user',
+              id: 'usr-123',
+              name: 'admin'
+            }
+          ]
+        }
+      ]
+    }
+  }
+
+  async acknowledgeAlert(alertId: string) {
+    // Mock implementation
+    return true
+  }
+
+  async dismissAlert(alertId: string) {
+    // Mock implementation
+    return true
+  }
+
+  async getAlertDetails(alertId: string) {
+    // Mock implementation
+    return {
+      id: alertId,
+      title: 'Critical Vulnerability Detected',
+      message: 'A critical vulnerability was detected in the production server.',
+      type: 'error',
+      severity: 'critical',
+      source: 'Vulnerability Scanner',
+      timestamp: new Date().toISOString(),
+      acknowledged: false,
+      relatedEntities: [
+        {
+          type: 'server',
+          id: 'srv-001',
+          name: 'Production Web Server'
+        }
+      ],
+      details: {
+        cve: 'CVE-2023-1234',
+        description: 'Remote code execution vulnerability in web server software',
+        remediation: 'Update web server to latest version',
+        affectedSystems: ['srv-001', 'srv-002'],
+        timeline: [
+          {
+            timestamp: new Date(Date.now() - 7200000).toISOString(),
+            event: 'Vulnerability detected'
+          },
+          {
+            timestamp: new Date(Date.now() - 3600000).toISOString(),
+            event: 'Alert created'
+          }
         ]
       }
-    ]
+    }
   }
 
   async getUserActivities(timeRange: string = '24h') {
@@ -281,7 +331,7 @@ export class LiquidModel {
   }
 
   async search(query: string) {
-    // Mock search results for now
+    // Mock search results
     return {
       items: [
         {
