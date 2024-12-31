@@ -1,28 +1,49 @@
 import { NextResponse } from 'next/server'
-import { LiquidModel } from '@/app/lib/liquid-model'
+import prisma from '@/app/lib/prisma'
 
 export async function GET() {
   try {
-    const liquidModel = new LiquidModel()
-    const userBehaviorData = await liquidModel.getUserBehavior()
-    
-    return NextResponse.json({
-      riskScore: userBehaviorData.risk_score,
-      totalUsers: userBehaviorData.total_users,
-      activeUsers: userBehaviorData.active_users,
-      categories: userBehaviorData.behavior_categories.map((category: any) => ({
-        name: category.name,
-        count: category.count,
-        riskLevel: category.risk_level.toLowerCase()
-      })),
-      recentActivities: userBehaviorData.recent_activities.map((activity: any) => ({
-        user: activity.username,
-        action: activity.action,
-        timestamp: activity.timestamp,
-        riskLevel: activity.risk_level.toLowerCase()
-      })),
-      lastUpdated: userBehaviorData.last_updated
+    // Get metrics from SecurityMetric model
+    const metrics = await prisma.securityMetric.findMany({
+      where: { category: 'user_behavior' },
+      orderBy: { timestamp: 'desc' },
+      take: 30,
     })
+
+    // Calculate risk score based on metrics
+    const riskScore = metrics.reduce((acc, m) => acc + m.value, 0) / metrics.length || 0
+
+    // Mock data for now
+    const response = {
+      riskScore: Math.round(riskScore * 100) / 100,
+      anomalies: [
+        {
+          type: 'login',
+          description: 'Multiple failed login attempts',
+          severity: 'high',
+          timestamp: new Date().toISOString(),
+        },
+        {
+          type: 'access',
+          description: 'Unusual file access pattern',
+          severity: 'medium',
+          timestamp: new Date().toISOString(),
+        },
+      ],
+      trends: {
+        daily: [
+          { timestamp: new Date().toISOString(), score: 75 },
+          { timestamp: new Date(Date.now() - 86400000).toISOString(), score: 82 },
+        ],
+        weekly: [
+          { timestamp: new Date().toISOString(), score: 78 },
+          { timestamp: new Date(Date.now() - 604800000).toISOString(), score: 85 },
+        ],
+      },
+      lastUpdated: new Date().toISOString(),
+    }
+
+    return NextResponse.json(response)
   } catch (error) {
     console.error('Error fetching user behavior data:', error)
     return NextResponse.json(

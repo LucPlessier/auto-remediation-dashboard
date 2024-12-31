@@ -279,4 +279,35 @@ export class LiquidModel {
       }
     ]
   }
+
+  async search(query: string) {
+    // Mock search results for now
+    return {
+      items: [
+        {
+          type: 'vulnerability',
+          title: 'Critical SQL Injection',
+          description: 'SQL Injection vulnerability found in login form',
+          severity: 'high',
+          timestamp: new Date().toISOString(),
+        },
+        {
+          type: 'asset',
+          title: 'Web Server',
+          description: 'Production web server with critical vulnerabilities',
+          severity: 'medium',
+          timestamp: new Date().toISOString(),
+        },
+        {
+          type: 'threat',
+          title: 'Suspicious Login Activity',
+          description: 'Multiple failed login attempts detected',
+          severity: 'low',
+          timestamp: new Date().toISOString(),
+        }
+      ],
+      total: 3,
+      query
+    }
+  }
 }

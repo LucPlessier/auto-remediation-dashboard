@@ -1,14 +1,12 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import '@/styles/globals.css'
-import { TopNav } from '@/components/top-nav'
-import { SideNav } from '@/components/side-nav'
+import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'CTEM Enterprise',
-  description: 'Centralized Threat Exposure Management Dashboard',
+  title: 'CTEM Enterprise Dashboard',
+  description: 'Comprehensive Threat and Exposure Management Dashboard',
 }
 
 export default function RootLayout({
@@ -19,13 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="relative flex min-h-screen">
-          <SideNav />
-          <div className="flex-1">
-            <TopNav />
-            <main className="flex-1">{children}</main>
-          </div>
-        </div>
+        {children}
       </body>
     </html>
   )
