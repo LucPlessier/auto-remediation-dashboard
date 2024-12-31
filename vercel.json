@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "exposure-management-latest-5",
   "builds": [
     {
       "src": "package.json",
