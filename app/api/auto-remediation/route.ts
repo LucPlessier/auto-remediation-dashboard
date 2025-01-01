@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import prisma from "@/app/lib/prisma"
-import { AutoRemediationService } from "@/services/auto-remediation"
+import { LiquidModelService } from '@/services/liquid-model-service'
 import { z } from 'zod'
 
 // Validation schemas
@@ -23,8 +23,8 @@ const RemediationConfigSchema = z.object({
 
 export async function GET() {
   try {
-    const service = new AutoRemediationService()
-    const status = await service.getStatus()
+    const liquidModel = LiquidModelService.getInstance()
+    const status = await liquidModel.getStatus()
 
     // Get historical metrics
     const metrics = await prisma.autoRemediationMetrics.findMany({
@@ -41,12 +41,16 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const data = await request.json()
-    const service = new AutoRemediationService()
-    const result = await service.executeRemediation(data)
-    return NextResponse.json({ result })
+    const { threatId } = await request.json()
+    if (!threatId) {
+      return new NextResponse('Missing threatId', { status: 400 })
+    }
+
+    const liquidModel = LiquidModelService.getInstance()
+    const result = await liquidModel.startRemediation(threatId)
+    return NextResponse.json(result)
   } catch (error) {
-    console.error('Error in auto-remediation POST:', error)
+    console.error('Error starting remediation:', error)
     return new NextResponse('Internal Server Error', { status: 500 })
   }
 }
@@ -56,8 +60,8 @@ export async function PUT(req: Request) {
     const data = await req.json()
     const status = RemediationStatusSchema.parse(data)
     
-    const service = new AutoRemediationService()
-    await service.updateStatus(status)
+    const liquidModel = LiquidModelService.getInstance()
+    await liquidModel.updateStatus(status)
 
     return new NextResponse('Status updated', { status: 200 })
   } catch (error) {

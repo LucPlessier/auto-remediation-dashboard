@@ -1,6 +1,7 @@
 import prisma from "@/app/lib/prisma"
 import { PrismaClient } from "@prisma/client"
 import { z } from 'zod';
+import { DummyDataService } from './dummy-data'
 
 // Types
 export interface RemediationStatus {
@@ -21,78 +22,42 @@ export interface RemediationConfig {
 }
 
 export class AutoRemediationService {
-  private prisma: PrismaClient
+  private dummyData: DummyDataService
 
   constructor() {
-    this.prisma = prisma
+    this.dummyData = new DummyDataService()
   }
 
   async getStatus(): Promise<RemediationStatus> {
     try {
-      // Get current status from database
-      const status = await this.prisma.autoRemediationStatus.findFirst({
-        orderBy: { timestamp: 'desc' },
-      })
-
-      // Get active remediations
-      const activeCount = await this.prisma.remediation.count({
-        where: { status: 'active' },
-      })
-
-      // Get completed remediations
-      const completedCount = await this.prisma.remediation.count({
-        where: { status: 'completed' },
-      })
-
-      // Get failed remediations
-      const failedCount = await this.prisma.remediation.count({
-        where: { status: 'failed' },
-      })
-
-      // Get current config
-      const config = await this.getConfig();
-
-      return {
-        isRunning: status?.isRunning || false,
-        activeRemediations: activeCount,
-        completedRemediations: completedCount,
-        failedRemediations: failedCount,
-        lastUpdate: status?.timestamp || new Date(),
-        config,
-      }
+      return this.dummyData.getRemediationStatus()
     } catch (error) {
       console.error('Error getting auto-remediation status:', error)
       throw error
     }
   }
 
-  async executeRemediation(data: any) {
+  async executeRemediation(data: { threatId: string }) {
     try {
-      // For now, just log the data and return a success message
-      console.log("Executing remediation with data:", data)
-      return { success: true, message: "Remediation executed successfully" }
+      const remediation = this.dummyData.executeRemediation(data.threatId)
+      return { success: true, remediation }
     } catch (error) {
       console.error('Error executing remediation:', error)
       throw error
     }
   }
 
-  async updateStatus(status: { remediationId: string; status: string; details?: Record<string, unknown> }): Promise<void> {
+  async updateStatus(status: { 
+    remediationId: string
+    status: 'active' | 'completed' | 'failed'
+    details?: Record<string, unknown>
+  }): Promise<void> {
     try {
-      // Update remediation status in database
-      await this.prisma.remediation.update({
-        where: { id: status.remediationId },
-        data: {
-          status: status.status,
-          details: status.details || {},
-          lastUpdate: new Date(),
-        },
-      })
-
-      // If remediation failed, create an incident
-      if (status.status === 'failed') {
-        await this.createIncident(status.remediationId, status.details);
-      }
+      this.dummyData.updateRemediationStatus(
+        status.remediationId,
+        status.status,
+        status.details
+      )
     } catch (error) {
       console.error('Error updating remediation status:', error)
       throw error
@@ -114,28 +79,11 @@ export class AutoRemediationService {
   }
 
   private async createIncident(remediationId: string, details?: Record<string, unknown>): Promise<void> {
-    try {
-      const remediation = await this.prisma.remediation.findUnique({
-        where: { id: remediationId },
-      });
-
-      if (!remediation) {
-        throw new Error('Remediation not found');
-      }
-
-      await this.prisma.incident.create({
-        data: {
-          title: `Auto-remediation failure: ${remediation.title}`,
-          description: `Auto-remediation action failed.\nRemediation ID: ${remediationId}\nDetails: ${JSON.stringify(details, null, 2)}`,
-          severity: 'high',
-          status: 'open',
-          type: 'auto_remediation_failure',
-          remediationId,
-        },
-      });
-    } catch (error) {
-      console.error('Error creating incident for failed remediation:', error);
-      throw error;
-    }
+    // In dummy data mode, just log the incident
+    console.log('Creating incident for failed remediation:', {
+      remediationId,
+      details,
+      timestamp: new Date(),
+    })
   }
 }

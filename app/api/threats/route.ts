@@ -1,34 +1,30 @@
-import { NextResponse } from 'next/server'
-import { LiquidModel } from '@/app/lib/liquid-model'
+import { NextResponse } from "next/server"
+import { LiquidModelService } from "@/services/liquid-model-service"
+
+const liquidModel = LiquidModelService.getInstance()
 
 export async function GET() {
   try {
-    const liquidModel = new LiquidModel()
-    const threatData = await liquidModel.getThreatIntelligence()
-    
-    return NextResponse.json({
-      newThreats: threatData.new_threats_count,
-      totalThreats: threatData.total_threats,
-      severityLevel: threatData.overall_severity.toLowerCase(),
-      severityScore: threatData.severity_score,
-      categories: threatData.threat_categories.map((category: any) => ({
-        name: category.name,
-        count: category.count,
-        severity: category.severity.toLowerCase()
-      })),
-      recentActivity: threatData.recent_activity.map((activity: any) => ({
-        type: activity.type,
-        timestamp: activity.timestamp,
-        description: activity.description,
-        severity: activity.severity.toLowerCase()
-      })),
-      lastUpdated: new Date().toISOString()
-    })
+    const threats = await liquidModel.getThreats()
+    return NextResponse.json(threats)
   } catch (error) {
-    console.error('Error fetching threat data:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch threat intelligence data' },
-      { status: 500 }
-    )
+    console.error('Error fetching threats:', error)
+    return new NextResponse('Internal Server Error', { status: 500 })
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const data = await request.json()
+    const threat = liquidModel.getThreat(data.id)
+    
+    if (!threat) {
+      return new NextResponse('Threat not found', { status: 404 })
+    }
+    
+    return NextResponse.json(threat)
+  } catch (error) {
+    console.error('Error processing threat:', error)
+    return new NextResponse('Internal Server Error', { status: 500 })
   }
 }
