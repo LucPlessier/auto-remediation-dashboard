@@ -32,6 +32,19 @@ export class LiquidModelClient {
     return response
   }
 
+  async getStatus() {
+    const response = await this.request('/api/auto-remediation')
+    return response
+  }
+
+  async updateStatus(status: any) {
+    const response = await this.request('/api/auto-remediation/status', {
+      method: 'POST',
+      body: JSON.stringify(status)
+    })
+    return response
+  }
+
   private async request(endpoint: string, options: RequestInit = {}) {
     const url = `${this.baseUrl}${endpoint}`
     const response = await fetch(url, {

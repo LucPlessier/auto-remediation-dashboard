@@ -54,6 +54,24 @@ export class LiquidModelService {
     }
   }
 
+  async getStatus() {
+    try {
+      return await this.client.getStatus()
+    } catch (error) {
+      console.error('Error getting status:', error)
+      throw error
+    }
+  }
+
+  async updateStatus(status: any) {
+    try {
+      return await this.client.updateStatus(status)
+    } catch (error) {
+      console.error('Error updating status:', error)
+      throw error
+    }
+  }
+
   private transformAttackPaths(data: any) {
     // Transform Liquid Model attack path data to UI format
     return {
